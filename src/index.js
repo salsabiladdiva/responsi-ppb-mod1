@@ -14,9 +14,20 @@ app.use('/items', itemRoutes);
 
 const port = process.env.PORT || 5000;
 
-app.get('/', (req, res) => {
-  res.send('API berjalan! Silakan akses /items');
+app.get('/', async (req, res) => {
+  try {
+    const { error } = await supabase.from('items').select('id').limit(1);
+    if (error) throw error;
+    res.send('✅ API berjalan dan terkoneksi ke Supabase! Silakan akses /items');
+  } catch (err) {
+    res
+      .status(503)
+      .send(
+        '❌ Terjadi kesalahan saat menjalankan server: API belum siap atau koneksi database gagal.'
+      );
+  }
 });
+
 
 // 🧠 Cek koneksi Supabase di awal
 let isConnected = false;
